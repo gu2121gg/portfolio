@@ -190,8 +190,13 @@
         </div>
 
         <div class="counter-box">
-            <p style="color: #000080; font-size: small;">
-                Você é o <span id="visitor-count">...</span>º visitante desde 2025!
+            <div style="display: inline-block; border: 3px ridge #808080; padding: 8px 15px; background: #000000;">
+                <span style="color: #00ff00; font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold;">
+                    VISITANTES: <span id="visit-counter">0042</span>
+                </span>
+            </div>
+            <p style="color: #000080; font-size: small; margin-top: 8px;">
+                Você é um dos visitantes desde 2025!
             </p>
         </div>
 
@@ -203,41 +208,28 @@
     </div>
 
     <script>
-        async function updateVisitorCounter() {
-            const counterElement = document.getElementById('visitor-count');
+        function animateCounter() {
+            const counter = document.getElementById('visit-counter');
+            let count = localStorage.getItem('localVisits') ? parseInt(localStorage.getItem('localVisits')) : 42;
             
-            try {
-                const pageUrl = encodeURIComponent(window.location.href || 'https://github.com/seu-usuario/portfolio');
-                const apiUrl = `https://hits.dwyl.com/${pageUrl}.json`;
-                
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-                
-                const count = data.hits || 42;
-                counterElement.textContent = count.toString().padStart(4, '0');
-            } catch (error) {
-                console.log('Usando contador visual alternativo');
-                
-                const img = document.createElement('img');
-                img.src = 'https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fgustavo-portfolio&count_bg=%23000080&title_bg=%23C0C0C0&icon=&icon_color=%23E7E7E7&title=Visitantes&edge_flat=true';
-                img.style.display = 'none';
-                
-                img.onload = function() {
-                    const match = this.src.match(/count=(\d+)/);
-                    if (match) {
-                        counterElement.textContent = match[1].padStart(4, '0');
-                    }
-                };
-                
-                document.body.appendChild(img);
+            count++;
+            localStorage.setItem('localVisits', count);
+            
+            let current = parseInt(counter.textContent);
+            const target = count;
+            
+            if (current < target) {
+                const interval = setInterval(() => {
+                    current++;
+                    counter.textContent = current.toString().padStart(4, '0');
+                    if (current >= target) clearInterval(interval);
+                }, 50);
+            } else {
+                counter.textContent = count.toString().padStart(4, '0');
             }
         }
         
-        updateVisitorCounter();
-        
-        setInterval(() => {
-            updateVisitorCounter();
-        }, 60000);
+        window.addEventListener('load', animateCounter);
     </script>
 </body>
 </html>
